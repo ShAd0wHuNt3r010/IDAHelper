@@ -1,7 +1,6 @@
 from idautils import *
 from idaapi import *
 from idc import *
-from parse import *
 
 
 class StaticAnalysis:
@@ -30,7 +29,7 @@ class StaticAnalysis:
         args_f = [None] * number_of_args
         arg_counter = 0
 
-        for i in range(0,10):
+        for i in range(0, 10):
             address = PrevHead(address, 0)
             if arg_counter == number_of_args:
                 break
@@ -51,30 +50,40 @@ class StaticAnalysis:
     @staticmethod
     def get_block_id(flow_chart, specific_address):
         for index in range(0, flow_chart.size):
-            block = flow_chart._getitem(index)
-            if specific_address >= block.startEA and specific_address < block.endEA:
+            block = flow_chart[index]
+            if block.endEA > specific_address >= block.startEA:
                 return index
 
     @staticmethod
     def get_block_start_address(flow_chart, specific_address):
         for index in range(0, flow_chart.size):
-            block = flow_chart._getitem(index)
-            if specific_address >= block.startEA and specific_address < block.endEA:
+            block = flow_chart[index]
+            if block.endEA > specific_address >= block.startEA:
                 return block.startEA
+
+    @staticmethod
+    def get_block_end_address(flow_chart, specific_address):
+        for index in range(0, flow_chart.size):
+            block = flow_chart[index]
+            if block.endEA > specific_address >= block.startEA:
+                return block.endEA
 
     @staticmethod
     def is_add_in_func(func_start_add, address):
         if GetFunctionAttr(address, FUNCATTR_START) == func_start_add:
             return True
-        else: return False
+        else:
+            return False
 
     @staticmethod
     def find_ins_txt(address, ins_str):
         res_list = []
         while 1:
             address = FindText(address, SEARCH_DOWN, 0, 0, ins_str)
-            if address == BADADDR: break
+            if address == BADADDR:
+                break
             res_list.append(address)
             address = NextHead(int(address))
-            if address == BADADDR: break
+            if address == BADADDR:
+                break
         return res_list
